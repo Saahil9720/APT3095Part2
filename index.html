@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
+
+      body {
+        font-family: "Roboto", sans-serif;
+        background-color: #f8f9fa;
+        color: #333;
+      }
+
+      .App {
+        max-width: 100%;
+      }
+
+      .App-header {
+        background-color: #007bff;
+        color: white;
+        padding: 20px;
+        border-radius: 8px 8px 0 0;
+        text-align: center;
+      }
+
+      h1,
+      h3 {
+        margin: 0.5rem;
+      }
+      h5 {
+        text-align: center;
+      }
+
+      .container {
+        padding-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      .card {
+        background: white;
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        margin-bottom: 20px;
+      }
+
+      .card-body {
+        padding: 20px;
+      }
+
+      .card-title {
+        color: #007bff;
+      }
+      .col-md-6 {
+        -ms-flex: 0 0 50%;
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+
+      input[type="text"] {
+        font-size: 16px;
+        width: 75%;
+        padding: 10px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      button {
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      .btn-primary {
+        display: block;
+        margin: 0 auto;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      li {
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+      }
+
+      li:last-child {
+        border-bottom: none;
+      }
+
+      .btn-success {
+        margin-right: 10px;
+      }
+
+      .btn-danger {
+        color: white; /* Ensures text color is white */
+        background-color: #dc3545;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 10px 0;
+        background-color: #007bff;
+        color: white;
+        border-radius: 0 0 8px 8px;
+        margin-top: 20px;
+      }
+
+      /* Ensure delete button text is not strikethrough */
+      .btn-danger {
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="App">
+      <header class="App-header">
+        <h1>TO-DO LIST ✔</h1>
+        <h3>Nayana & Saahil</h3>
+      </header>
+      <main>
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title mb-4">Add a Task</h5>
+                  <form id="todoForm">
+                    <div class="mb-3">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="newTodo"
+                        placeholder="What do you need to do today?"
+                      />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                  </form>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title mb-4">My To-do List</h5>
+                  <ul id="todoList" class="list-group mt-4"></ul>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="card-title mb-4">Completed Tasks</h5>
+                  <ul id="completedList" class="list-group mt-4"></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <footer class="footer">
+        <p>&copy; Spring 2024 Nayana Das | Saahil Vekariya for APT3095.</p>
+      </footer>
+    </div>
+
+    <script>
+      document
+        .getElementById("todoForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          const newTodo = document.getElementById("newTodo").value;
+          addTodo(newTodo);
+        });
+
+      async function fetchTodoList() {
+        try {
+          const response = await fetch(
+            "https://3095-backend.vercel.app/todos-undone"
+          );
+          const todos = await response.json();
+          renderTodos(todos);
+          fetchCompletedTodos(); // Fetch completed todos after fetching undone todos
+        } catch (error) {
+          console.error("Error fetching todo list:", error);
+        }
+      }
+
+      async function addTodo(action) {
+        try {
+          await fetch("https://3095-backend.vercel.app/todos", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action }),
+          });
+          fetchTodoList();
+          document.getElementById("newTodo").value = ""; // Clear input field after submitting
+        } catch (error) {
+          console.error("Error adding todo:", error);
+        }
+      }
+
+      async function fetchCompletedTodos() {
+        try {
+          const response = await fetch(
+            "https://3095-backend.vercel.app/todos-done"
+          );
+          const completedTodos = await response.json();
+          renderCompletedTodos(completedTodos);
+        } catch (error) {
+          console.error("Error fetching completed todos:", error);
+        }
+      }
+
+      async function handleCompleted(action) {
+        try {
+          await fetch(
+            `https://3095-backend.vercel.app/todo-complete/${action}`,
+            {
+              method: "POST",
+            }
+          );
+          fetchTodoList();
+        } catch (error) {
+          console.error("Error marking todo as completed:", error);
+        }
+      }
+
+      function renderTodos(todos) {
+        const todoList = document.getElementById("todoList");
+        todoList.innerHTML = "";
+        todos.forEach((todo) => {
+          const todoItem = document.createElement("li");
+          todoItem.className =
+            "list-group-item d-flex justify-content-between align-items-center";
+          todoItem.textContent = todo.action;
+          const completeButton = document.createElement("button");
+          completeButton.className = "btn btn-sm btn-success";
+          completeButton.innerHTML = "Complete";
+          completeButton.onclick = () => handleCompleted(todo.action);
+          todoItem.appendChild(completeButton);
+          todoList.appendChild(todoItem);
+        });
+      }
+
+      function renderCompletedTodos(completedTodos) {
+        const completedList = document.getElementById("completedList");
+        completedList.innerHTML = "";
+        completedTodos.forEach((todo) => {
+          const todoItem = document.createElement("li");
+          todoItem.className =
+            "list-group-item d-flex justify-content-between align-items-center";
+          todoItem.textContent = todo.action;
+          todoItem.style.textDecoration = "line-through";
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "btn btn-sm btn-danger";
+          deleteButton.innerHTML = "Delete";
+          deleteButton.onclick = () => handleDeleteCompleted(todo.action);
+          todoItem.appendChild(deleteButton);
+          completedList.appendChild(todoItem);
+        });
+      }
+
+      async function handleDeleteCompleted(action) {
+        try {
+          await fetch(`https://3095-backend.vercel.app/todos/${action}`, {
+            method: "DELETE",
+          });
+          fetchCompletedTodos();
+        } catch (error) {
+          console.error("Error deleting completed todo:", error);
+        }
+      }
+
+      fetchTodoList(); // Fetch todos on initial load
+    </script>
+  </body>
+</html>
