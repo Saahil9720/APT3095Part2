@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/325303e6-ecab-422a-91f2-c1f87b99a855/resourceGroups/nayanasaahiltodo/providers/Microsoft.Web/sites/todoapplicationnayanasaahil",
+    "appService.deploySubpath": "."
+}
