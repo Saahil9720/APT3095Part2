@@ -176,7 +176,7 @@
       async function fetchTodoList() {
         try {
           const response = await fetch(
-            "https://3095-backend.vercel.app/todos-undone"
+            "http://localhost:3000/todos-undone"
           );
           const todos = await response.json();
           renderTodos(todos);
@@ -188,7 +188,7 @@
 
       async function addTodo(action) {
         try {
-          await fetch("https://3095-backend.vercel.app/todos", {
+          await fetch("http://localhost:3000/todos", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action }),
@@ -203,7 +203,7 @@
       async function fetchCompletedTodos() {
         try {
           const response = await fetch(
-            "https://3095-backend.vercel.app/todos-done"
+            "http://localhost:3000/todos-done"
           );
           const completedTodos = await response.json();
           renderCompletedTodos(completedTodos);
@@ -215,7 +215,7 @@
       async function handleCompleted(action) {
         try {
           await fetch(
-            `https://3095-backend.vercel.app/todo-complete/${action}`,
+            `http://localhost:3000/todo-complete/${action}`,
             {
               method: "POST",
             }
@@ -263,7 +263,7 @@
 
       async function handleDeleteCompleted(action) {
         try {
-          await fetch(`https://3095-backend.vercel.app/todos/${action}`, {
+          await fetch(`http://localhost:3000/todos/${action}`, {
             method: "DELETE",
           });
           fetchCompletedTodos();
